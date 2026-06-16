@@ -1,0 +1,73 @@
+[project]
+name = "mpce-web-app"
+version = "0.1.0"
+description = "Main application for MPCE department"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "asgiref==3.8.1",
+    "celery[redis]>=5.4.0",
+    "certifi==2025.7.14",
+    "channels[daphne]>=4.2.2",
+    "charset-normalizer==3.4.2",
+    "colorama==0.4.6",
+    "crispy-bootstrap5==2024.2",
+    "django>=5.1.3",
+    "django-auth-ldap==5.1.0",
+    "django-crispy-forms==2.3",
+    "django-extensions>=4.1",
+    "django-filter>=25.1",
+    "django-python3-ldap==0.15.8",
+    "django-select2>=8.4.3",
+    "environs==11.0.0",
+    "idna==3.10",
+    "iniconfig==2.1.0",
+    "ipython>=9.8.0",
+    "ldap3==2.9.1",
+    "marshmallow==3.22.0",
+    "mssql-django==1.6",
+    "openpyxl>=3.1.5",
+    "packaging==24.1",
+    "pillow==10.4.0",
+    "pluggy==1.6.0",
+    "psycopg>=3.3.2",
+    "psycopg2>=2.9.12",
+    "pyasn1==0.5.1",
+    "pyasn1-modules==0.4.1",
+    "pygments==2.19.2",
+    "pyodbc==5.2.0",
+    "pytest-mock>=3.15.1",
+    "python-dateutil==2.9.0.post0",
+    "python-dotenv==1.0.1",
+    "python-ldap==3.4.5",
+    "requests==2.32.4",
+    "resolved>=0.0.3",
+    "six==1.17.0",
+    "sqlparse==0.5.1",
+    "tzdata==2024.1",
+    "urllib3==2.5.0",
+    "uvicorn>=0.40.0",
+    "wfastcgi==3.0.0",
+    "whitenoise>=6.11.0",
+]
+
+[tool.uv.sources]
+python-ldap = { path = "lib_resource/python_ldap-3.4.5-cp313-cp313-win_amd64.whl" }
+[tool.pytest.ini_options]
+DJANGO_SETTINGS_MODULE = 'configuration.settings'
+python_files = ["test_*.py", "*_test.py", "testing/python/*.py"]
+
+
+[dependency-groups]
+dev = [
+    "django-browser-reload>=1.21.0",
+    "pytest>=8.4.2",
+    "pytest-django==4.11.1",
+    "pytest-factoryboy>=2.8.1",
+    "factory-boy>=3.3.3",
+    "pytest-cov>=6.3.0",
+    "pytest-django>=4.11.1",
+    "coverage==7.10.2",
+    "django-debug-toolbar>=6.3.0",
+    "django-extensions>=4.1",
+]

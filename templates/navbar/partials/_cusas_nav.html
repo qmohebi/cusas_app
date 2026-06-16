@@ -1,0 +1,33 @@
+{% block service-nav %} {% endblock %}
+
+<li class="nav-item">
+  <a href="{% url 'cusas:report_fault' %}" class="nav-link nav__link"
+    >Report Fault</a
+  >
+</li>
+
+{% if perms.accounts.manage_profiles %}
+<li class="nav-item dropdown">
+  <a
+    class="nav-link dropdown-toggle nav__link"
+    href="#"
+    id="navbarDropdownAdmin"
+    role="button"
+    data-bs-toggle="dropdown"
+    aria-expanded="false"
+  >
+    CUSAS Admin
+  </a>
+
+  <ul class="dropdown-menu" aria-labelledby="navbarDropdownAdmin">
+    <li>
+      <a class="nav__link" href="{% url 'cusas:user_management' %}"
+        >User Management</a
+      >
+    </li>
+    <li>
+      <a class="nav__link" href="{% url 'cusas:library' %}">Device list</a>
+    </li>
+  </ul>
+</li>
+{% endif %}

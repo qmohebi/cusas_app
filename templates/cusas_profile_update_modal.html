@@ -1,0 +1,29 @@
+<form
+  method="POST"
+  hx-post="{% url 'update_profile' profile.id %}"
+  hx-target="#profile-modal"
+  hx-swap="innerHTML"
+>
+  {% csrf_token %}
+  <div class="form-group">
+    <label for="user">Username</label>
+    <input
+      type="text"
+      class="form-control"
+      id="user"
+      name="user"
+      value="{{ profile.user }}"
+    />
+  </div>
+  <div class="form-group">
+    <label for="locations">Locations</label>
+    <input
+      type="text"
+      class="form-control"
+      id="locations"
+      name="locations"
+      value="{{ profile.locations.all|join:',' }}"
+    />
+  </div>
+  <button type="submit" class="btn btn-primary">Update</button>
+</form>

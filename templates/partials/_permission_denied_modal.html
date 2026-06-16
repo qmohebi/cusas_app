@@ -1,0 +1,37 @@
+<div
+  id="permissionDeniedModal"
+  class="modal fade"
+  tabindex="-1"
+  aria-hidden="true"
+  hx-swap-oob="true"
+>
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Permission denied</h5>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+          aria-label="Close"
+          onclick="bootstrap.Modal.getInstance(this.closest('.modal'))?.hide()"
+        ></button>
+      </div>
+      <div class="modal-body">
+        <p>
+          You don’t have access to this function. If you think this is an error,
+          contact an admin.
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<script>
+  (function () {
+    var el = document.getElementById("permissionDeniedModal");
+    var m = bootstrap.Modal.getOrCreateInstance(el, { backdrop: "static" });
+    m.show();
+  })();
+</script>

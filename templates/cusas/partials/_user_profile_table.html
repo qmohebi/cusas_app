@@ -1,0 +1,27 @@
+
+<table class="table cusas-table ">
+  <thead>
+    <tr>
+      <th>Username</th>
+      <th>First Name</th>
+      <th>Last Name</th>
+      <th>Locations</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for profile in profiles %}
+    <tr>
+      <td>{{ profile.user }}</td>
+      <td>{{ profile.user.first_name }}</td>
+      <td>{{ profile.user.last_name }}</td>
+      <td>
+        {% for location in profile.locations.all %} {{ location }}{% if not forloop.last %}, {% endif %} {% endfor %}
+      </td>
+    </tr>
+    {% empty %}
+    <tr>
+      <td colspan="2">No profiles found.</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>

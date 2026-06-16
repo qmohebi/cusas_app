@@ -1,0 +1,108 @@
+{
+  // --- Keep: tab completion, autosave, textMate rules, theme, formatOnSave, explorer drag/drop ---
+  "editor.tabCompletion": "on",
+  "files.autoSave": "afterDelay",
+  "workbench.colorTheme": "One Dark Pro Night Flat",
+  "editor.formatOnSave": true,
+  "explorer.confirmDragAndDrop": false,
+  // --- Python: project-scoped, no machine paths; rely on venv autoselection ---
+  "python.analysis.autoSearchPaths": true,
+  "python.analysis.diagnosticSeverityOverrides": {
+    "reportMissingImports": "none"
+  },
+  "python.analysis.extraPaths": [
+    "${workspaceFolder}/src"
+  ],
+  "python.envFile": "${workspaceFolder}/.env",
+  "python.terminal.activateEnvironment": true,
+  // If your team insists on hard-wiring an interpreter, point at the repo venv.
+  // Windows users: .venv\\Scripts\\python.exe ; Unix/mac: .venv/bin/python
+  // "python.defaultInterpreterPath": "${workspaceFolder}/.venv/bin/python",
+  // --- Tests (pytest in repo venv) ---
+  "python.testing.pytestEnabled": true,
+  "python.testing.unittestEnabled": false,
+  "python.testing.cwd": "${workspaceFolder}/tests",
+  // Let VS Code discover pytest in the venv instead of hardcoding a path:
+  // "python.testing.pytestPath": "${workspaceFolder}/.venv/bin/pytest",
+  // --- Python formatting & linting via Ruff (formatter = Ruff, not Black) ---
+  "[python]": {
+    "editor.defaultFormatter": "charliermarsh.ruff",
+    "editor.formatOnSave": true
+  },
+  // Fix & organize imports on save with Ruff
+  "editor.codeActionsOnSave": {
+    "source.fixAll.ruff": "explicit",
+    "source.organizeImports.ruff": "explicit"
+  },
+  // --- JS/TS/HTML formatting (Prettier) ---
+  "[javascript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[javascriptreact]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.formatOnSave": true
+  },
+  "[html]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  // --- UI/UX niceties preserved from your user settings ---
+  "diffEditor.hideUnchangedRegions.enabled": true,
+  "terminal.integrated.enableMultiLinePasteWarning": false,
+  "explorer.confirmPasteNative": false,
+  "explorer.confirmDelete": false,
+  "git.openRepositoryInParentFolders": "never",
+  // --- File nesting patterns (handy for web & db artifacts) ---
+  "explorer.fileNesting.patterns": {
+    "*.ts": "${capture}.js",
+    "*.js": "${capture}.js.map, ${capture}.min.js, ${capture}.d.ts",
+    "*.jsx": "${capture}.js",
+    "*.tsx": "${capture}.ts",
+    "tsconfig.json": "tsconfig.*.json",
+    "package.json": "package-lock.json, yarn.lock, pnpm-lock.yaml, bun.lockb, bun.lock",
+    "*.sqlite": "${capture}.${extname}-*",
+    "*.db": "${capture}.${extname}-*",
+    "*.sqlite3": "${capture}.${extname}-*",
+    "*.db3": "${capture}.${extname}-*",
+    "*.sdb": "${capture}.${extname}-*",
+    "*.s3db": "${capture}.${extname}-*"
+  },
+  // --- Token color tweaks (keep your textMate rules) ---
+  "editor.tokenColorCustomizations": {
+    "textMateRules": [
+      {
+        "name": "One Dark italic",
+        "scope": [
+          "comment",
+          "entity.other.attribute-name",
+          "keyword",
+          "markup.underline.link",
+          "storage.modifier",
+          "storage.type",
+          "string.url",
+          "variable.language.super",
+          "variable.language.this"
+        ],
+        "settings": {
+          "fontStyle": "italic"
+        }
+      },
+      {
+        "name": "One Dark italic reset",
+        "scope": [
+          "keyword.operator",
+          "keyword.other.type",
+          "storage.modifier.import",
+          "storage.modifier.package",
+          "storage.type.built-in",
+          "storage.type.function.arrow",
+          "storage.type.generic",
+          "storage.type.java",
+          "storage.type.primitive"
+        ],
+        "settings": {
+          "fontStyle": ""
+        }
+      }
+    ]
+  }
+}

@@ -1,0 +1,79 @@
+{%extends "base.html"%}
+<!-- prettier-ignore -->
+{% block title %}
+Ultrasound Report Fault
+{% endblock%}
+{% block breadcrumb_items %}
+<li class="breadcrumb-item">
+  <a href="{% url 'cusas:cusas_home' %}">Worklist & Faults</a>
+</li>
+<li class="breadcrumb-item active" aria-current="page">Report Fault</li>
+
+<!-- prettier-ignore -->
+{% endblock %} {%block nav_elements %} 
+{% include "navbar/partials/_cusas_nav.html" %} 
+{% endblock %}
+{% block subtitle %}Report an ultrasound fault{% endblock %}
+{% block body_class %}
+  class="container mb-5 d-flex flex-column min-vh-100"
+{% endblock %}
+{% load crispy_forms_tags %}
+{% block content %}
+
+<form
+  id="fault-form"
+  action=""
+  method="post"
+  class="needs-validation mb-5"
+  novalidate
+>
+  {% csrf_token %}
+  <section class="form-content" id="formContent">
+    <div class="form-input mt-4">
+      <label for="{{ form.asset_number.id_for_label}}" class="form-label">
+        {{ form.asset_number.label}}
+      </label>
+      {{ form.asset_number|as_crispy_field}}
+      <label for="{{ form.reported_fault.id_for_label}}" class="form-label">
+        {{ form.reported_fault.label}}
+      </label>
+      {{ form.reported_fault|as_crispy_field}}
+      <div class="mt-4 d-flex gap-2">
+        <button type="submit" class="btn btn-primary" id="saveBtn">
+          Save results
+        </button>
+        <a
+          href="{% url 'cusas:cusas_home' %}"
+          class="btn btn-outline-secondary"
+        >
+          Back
+        </a>
+      </div>
+    </div>
+  </section>
+</form>
+<!-- prettier-ignore -->
+{% include "partials/_success_modal.html" %}
+{% if show_success_modal %} 
+{{ modal_payload|json_script:'success-modal-payload' }}
+{% endif %}
+{% endblock %} {% block scripts %}
+<script>
+  // sets the asset number as select2 field
+  $(function () {
+    // Init Select2
+    $("#id_asset_number").select2({ theme: "bootstrap-5" });
+
+    // on modal close, clear the form
+    const modalElement = document.getElementById("successModal");
+    modalElement.addEventListener("hidden.bs.modal", function () {
+      const form = document.getElementById("fault-form");
+      form.reset();
+      form.classList.remove("was-validated");
+
+      $("#id_asset_number").val(null).trigger("change");
+      document.getElementById("id_reported_fault").value = "";
+    });
+  });
+</script>
+{% endblock %}

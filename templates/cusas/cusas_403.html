@@ -1,0 +1,28 @@
+{% extends "base.html" %} {% block breadcrumb_items %}
+<li class="breadcrumb-item">
+  <a href="{% url 'cusas_app:cusas_home' %}">Worklist & Faults</a>
+</li>
+<li class="breadcrumb-item active" aria-current="page">
+  Machine {{ machine }}
+</li>
+{% endblock %}
+<!-- prettier-ignore -->
+{% block subtitle %}Access denied{% endblock %}
+{% block breadcrumb %}{% endblock %} {% block content %}
+
+<div class="cusas-card-wrapper">
+  <div class="cusas-card">
+    <!-- <h1 class="card-title text-center mb-3">Access denied</h1> -->
+    <p class="lead mb-0">
+      {% if not perms.accounts.manage_profiles %} This page is restricted to
+      Ultrasound Admin only! {% else %} You are logged in but your account
+      doesn't have a CUSAS Profile.
+    </p>
+    <p>
+      If you belive you should have access, please contact
+      <a href="mailto: {{ support_email}}">{{ support_email }}</a>
+    </p>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

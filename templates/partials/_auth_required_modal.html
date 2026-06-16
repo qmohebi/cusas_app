@@ -1,0 +1,38 @@
+<div
+  class="modal fade show"
+  style="display: block"
+  tabindex="-1"
+  role="dialog"
+  aria-modal="true"
+>
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Sign-in required</h5>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+          aria-label="Close"
+          onclick="this.closest('.modal').remove()"
+        ></button>
+      </div>
+      <div class="modal-body">
+        <p>You need to sign in to access this page.</p>
+      </div>
+      <div class="modal-footer">
+        <a class="btn btn-primary" href="{% url 'accounts:login' %}"
+          >Go to login</a
+        >
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  (function () {
+    var el = document.getElementById("permissionDeniedModal");
+    var m = bootstrap.Modal.getOrCreateInstance(el, { backdrop: "static" });
+    m.show();
+  })();
+</script>

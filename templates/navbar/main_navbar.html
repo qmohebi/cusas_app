@@ -1,0 +1,31 @@
+<li class="nav__item">
+  <a href="/" class="nav-link nav__link">Home</a>
+</li>
+
+{% if show_services is not False %}
+<li class="nav__item dropdown">
+  <a
+    class="nav-link nav__link dropdown-toggle"
+    href="#"
+    id="navbarDropdownServices"
+    role="button"
+    data-bs-toggle="dropdown"
+    aria-expanded="false"
+  >
+    Services
+  </a>
+
+  <ul
+    class="dropdown-menu"
+    aria-labelledby="navbarDropdownServices"
+  >
+    {% for service in services %}
+    <li>
+      <a class="dropdown-item" href="{% url service.url %}">
+        {{ service.section }}
+      </a>
+    </li>
+    {% endfor %}
+  </ul>
+</li>
+{% endif %}

@@ -1,0 +1,56 @@
+{% extends 'base.html' %} {% load crispy_forms_tags %} {% block title %} MPCE
+Login {% endblock %} {% block subtitle %} {% endblock %} {% block breadcrumb %}
+{% endblock %}
+<!-- prettier-ignore -->
+{% block content %}
+<div class="w-100 mx-auto" style="max-width: 400px;">
+<h4 class="card-title text-center mb-3">Please Sign in</h4>
+<div class="form-signin-card">
+  <div class="card-body">
+    <form method="post" id="login-form">
+      {% csrf_token %} {% if next %}
+      <input
+        type="hidden"
+        name="{{ redirect_field_name }}"
+        value="{{ next }}"
+      />
+      {% endif %} {{ form|crispy }}
+
+      <button
+        type="submit"
+        id="login-btn"
+        class="btn btn-lg btn-primary w-100 d-flex align-items-center justify-content-center gap-2"
+      >
+        <span id="login-label"> Sign in</span>
+        <span
+          id="login-spinner"
+          class="spinner-grow spinner-grow-sm d-none"
+          role="status"
+          aria-hidden="true"
+        ></span>
+      </button>
+    </form>
+  </div>
+</div>
+</div>
+{% endblock %}
+{% block scripts %}
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const form = document.getElementById("login-form");
+    const btn = document.getElementById("login-btn");
+    const btnLable = document.getElementById("login-label");
+    const spinner = document.getElementById("login-spinner");
+
+    if (!form) return;
+
+    form.addEventListener("submit", function () {
+      btn.disabled = true;
+      btnLable.textContent = "Signing in…";
+
+      spinner.classList.remove("d-none");
+    });
+  });
+</script>
+
+{% endblock %}

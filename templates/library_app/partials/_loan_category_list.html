@@ -1,0 +1,23 @@
+{# templates/partials/_loan_category_list.html #}
+<div class="category-selection">
+  <div class="categories ">
+    {% for category in queryset %}
+    <label
+      class="category d-flex justify-content-between flex-column gap-2 bg-white border-0"
+    >
+      <input type="checkbox" name="category" value="{{ category.pk }}" />
+      <img
+        src="{{ category.image.url }}"
+        class="card-img object-fit-contain p-2"
+        alt="{{ category.display_name }}"
+        
+      />
+      <div class="device-title pt-3 pb-3 text-center fw-bold">
+        <span>{{ category.display_name }}</span>
+      </div>
+    </label>
+    {% empty %}
+    <p class="text-muted">No equipment available.</p>
+    {% endfor %}
+  </div>
+</div>

@@ -1,0 +1,255 @@
+{% extends "base.html" %} {% load crispy_forms_tags crispy_forms_field %}
+<!-- prettier-ignore -->
+{%block nav_elements %} 
+{% include "navbar/partials/_cusas_nav.html" %} {% endblock %}
+<!-- ignore-prettier -->
+{% block breadcrumb_items %}
+<li class="breadcrumb-item">
+  <a href="{% url 'cusas_app:cusas_home' %}">Worklist & Faults</a>
+</li>
+<li class="breadcrumb-item active" aria-current="page">
+  Machine {{ machine }}
+</li>
+{% endblock %}
+
+<!-- prettier-ignore -->
+{% block title %}
+CUSAS-Probe QA
+{% endblock %} 
+
+{% block subtitle%}Probe QA for {{ machine }} in {{ machine.machine_room }} {% endblock %}
+<!-- prettier-ignore -->
+{% block body_class %}
+  class="container mb-5 d-flex flex-column min-vh-100 cusas-page"
+{% endblock %}
+
+{% block content %}
+<form method="post" class="needs-validation mb-5" id="qa-form" novalidate>
+  {% csrf_token %} {{ formset.management_form }}
+  <!-- prettier-ignore -->
+  {% if formset.non_form_errors %}
+  <div class="alert alert-danger">{{ formset.non_form_errors }}</div>
+
+  {% endif %}
+  <table class="table align-middle cusas-table cusas-table-form">
+    <thead class="table-light">
+      <tr>
+        <th scope="col">Probe</th>
+        <th scope="col">Visual inspection</th>
+        <th scope="col">Uniformity</th>
+        <th scope="col">Depth of reverb (cm)</th>
+        <th scope="col">Noise level gain (dB)</th>
+        <th scope="col">Report an issue</th>
+      </tr>
+    </thead>
+    {% if rows %}
+    <tbody class="probe-rows">
+      {% for probe, form in rows %}
+      <tr class="probe-row">
+        <td class="probe-info-cell">
+          <!-- prettier-ignore -->
+          {{ probe }} {{ form.probe_id }} <br /><br />
+          <strong>SN:</strong> {{probe.serial_number }}
+        </td>
+        <td class="inspection-cell">{{ form.inspection|as_crispy_field }}</td>
+
+        <td>{{ form.uniformity|as_crispy_field }}</td>
+
+        <td>
+          <div
+            hx-post="{% url 'cusas:probe-field-check' 'reverb' %}"
+            hx-trigger="change from:input[name='{{ form.reverb.html_name }}'] delay:200ms"
+            hx-target="#{{ form.prefix }}-reverb-error"
+            hx-swap="innerHTML"
+            hx-include="closest tr"
+          >
+            {{ form.reverb|as_crispy_field }}
+          </div>
+          <div
+            id="{{ form.prefix }}-reverb-error"
+            class="small text-danger"
+          ></div>
+        </td>
+
+        <td>
+          <div
+            hx-post="{% url 'cusas:probe-field-check' 'noise' %}"
+            hx-trigger="change from:input[name='{{ form.noise.html_name }}'] delay: 200ms"
+            hx-target="#{{ form.prefix }}-noise-error"
+            hx-swap="innerHTML"
+            hx-include="closest tr"
+          >
+            {{ form.noise|as_crispy_field }}
+          </div>
+          <div
+            id="{{ form.prefix }}-noise-error"
+            class="medium text-danger"
+          ></div>
+        </td>
+        <td>
+          <div class="form-check">
+            {% crispy_field form.report_fault %}
+            <label
+              for="{{ form.report_fault.id_for_label }}"
+              class="form-check-label"
+            >
+              {{ form.report_fault.label }}
+            </label>
+          </div>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+    {% else %}
+    <tbody>
+      <tr>
+        <td colspan="6" class="text-center">
+          <div class="alert alert-light">
+            <h5>Sorry, no probes found for this machine.</h5>
+          </div>
+        </td>
+      </tr>
+    </tbody>
+    {% endif %}
+  </table>
+
+  <div class="accordion mt-3">
+    <div class="accordion-item">
+      <h2 class="accordion-header cusas-accordion-header">
+        <button
+          class="accordion-button collapsed"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#flush-collapseOne"
+          aria-expanded="false"
+          aria-controls="flush-collapseOne"
+        >
+          Click here to add faults with the machine
+        </button>
+      </h2>
+      <div
+        id="flush-collapseOne"
+        class="accordion-collapse collapse cusas-accordion-collapse"
+        data-bs-parent="#accordionFlushExample"
+      >
+        <div class="mt-4 text-start p-3">
+          <div class="d-flex flex-column">
+            {% crispy_field machine_form.log_fault %}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="mt-4 d-flex gap-2">
+    <button type="submit" class="btn btn-primary" id="saveBtn">
+      Save results
+    </button>
+    <a href="{% url 'cusas:cusas_home' %}" class="btn btn-outline-secondary">
+      Back
+    </a>
+  </div>
+</form>
+<!-- prettier-ignore -->
+{% include "partials/_success_modal.html" %}
+
+{% endblock %} {% block scripts %}
+<!-- prettier-ignore -->
+
+{% if modal_payload %}
+  {{ modal_payload|json_script:"success-modal-payload" }}
+{% endif %}
+<script>
+  // rule for checking the report fault checkbox on fail radio click
+  // uncheck that box on any other
+  (function initProbeAutoTickStrict() {
+    function applyRuleForRow(row) {
+      const checked = row.querySelector(
+        'input[type="radio"][name$="-inspection"]:checked',
+      );
+      const cb = row.querySelector(
+        'input[type="checkbox"][name$="-report_fault"]',
+      );
+      if (!cb) return;
+
+      cb.checked = !!checked && checked.value === "fail";
+    }
+
+    function onChange(e) {
+      if (!e.target.matches('input[type="radio"][name$="-inspection"]')) return;
+      const row = e.target.closest("tr.probe-row");
+      if (!row) return;
+
+      applyRuleForRow(row);
+    }
+
+    function setup() {
+      document.addEventListener("change", onChange);
+      document.querySelectorAll("tr.probe-row").forEach(applyRuleForRow);
+    }
+
+    if (document.readyState === "loading") {
+      document.addEventListener("DOMContentLoaded", setup);
+    } else {
+      setup();
+    }
+  })();
+  // load the modal
+  document.addEventListener("DOMContentLoaded", () => {
+    const payloadEl = document.getElementById("success-modal-payload");
+    if (!payloadEl) return;
+
+    const payload = JSON.parse(payloadEl.textContent);
+
+    const modalId = payload.modalId || "successModal";
+    const modalEl = document.getElementById(modalId);
+    if (!modalEl) return;
+
+    // Fill title + items if your modal is server-rendered empty or you want to override it
+    const titleEl = modalEl.querySelector(".modal-success-msg");
+    if (titleEl && payload.title) titleEl.textContent = payload.title;
+
+    const listEl = modalEl.querySelector(".success-modal-items");
+    if (listEl && Array.isArray(payload.items)) {
+      listEl.innerHTML = payload.items
+        .map(
+          (t) => `
+      <li class="px-3 py-2 rounded">
+        <div class="lh-base overflow-auto text-center">${t}</div>
+      </li>
+    `,
+        )
+        .join("");
+    }
+
+    // Modal handler
+    const modal = new bootstrap.Modal(modalEl);
+    modal.show();
+
+    modalEl.addEventListener(
+      "hidden.bs.modal",
+      () => {
+        window.location.href =
+          payload.redirectUrl || "{% url 'cusas:cusas_home' %}";
+      },
+      { once: true },
+    );
+  });
+
+  // minimal escaping to avoid XSS if any item ever contains user-provided text
+  function escapeHtml(str) {
+    return str.replace(
+      /[&<>"']/g,
+      (m) =>
+        ({
+          "&": "&amp;",
+          "<": "&lt;",
+          ">": "&gt;",
+          '"': "&quot;",
+          "'": "&#039;",
+        })[m],
+    );
+  }
+</script>
+
+{% endblock %}

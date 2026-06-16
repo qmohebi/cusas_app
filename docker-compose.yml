@@ -1,0 +1,12 @@
+services:
+  django-web: 
+    build:
+      context: .
+      dockerfile: docker/local.Dockerfile
+
+    ports:
+      - 8000:8000
+    volumes: 
+      - .:/app
+    env_file:
+      - .env

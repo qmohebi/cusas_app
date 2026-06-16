@@ -1,0 +1,40 @@
+<div
+  class="modal fade"
+  id="{{ modal_id|default:'successModal' }}"
+  data-bs-backdrop="static"
+  data-bs-keyboard="false"
+  tabindex="-1"
+  aria-labelledby="{{ modal_id|default:'successModal' }}Label"
+  aria-hidden="true"
+>
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content border-0 shadow-lg">
+      <div class="modal-body text-center mb-0">
+        <i class="bx bx-check-circle bx-tada pt-3"></i>
+        <h3 class="modal-success-msg mb-4">
+          {{ modal_title|default:"Success!" }}
+        </h3>
+        <ul class="success-modal-items list-unstyled d-grid gap-2 mb-0">
+          <!-- prettier-ignore -->
+          {# non-Ajax views, populate with context #} 
+            {% if modal_items %} 
+              {% for item in modal_items %}
+          <li class="px-3 py-2 rounded">
+            <div class="lh-base text-break">{{ item }}</div>
+          </li>
+          {% endfor %} {% endif %}
+        </ul>
+      </div>
+      <div class="modal-footer justify-content-center border-0 pt-0 pb-4">
+        <button
+          id="{{ modal_id|default:'successModal' }}_close_btn"
+          type="button"
+          class="btn btn-secondary rounded px-5"
+          data-bs-dismiss="modal"
+        >
+          Close
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

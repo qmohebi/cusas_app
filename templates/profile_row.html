@@ -1,0 +1,19 @@
+<tr id="profile-row-{{ profile.pk }}">
+  <td>
+    <a
+      href="#"
+      hx-get="{% url 'cusas_app:profile_edit' profile.pk %}"
+      hx-target="#modal-body"
+      hx-swap="innerHTML"
+    >
+      {{ profile.user }}
+    </a>
+  </td>
+  <td>
+    {% for location in profile.locations.all %}
+      {{ location }}{% if not forloop.last %}, {% endif %}
+    {% empty %}
+      <em>No locations</em>
+    {% endfor %}
+  </td>
+</tr>

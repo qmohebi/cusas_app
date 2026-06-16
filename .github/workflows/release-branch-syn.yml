@@ -1,0 +1,55 @@
+name: Sync release branch (strip dev folders)
+
+on:
+  push:
+    branches:
+      - release/**
+
+jobs:
+  strip-and-sync:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout release branch
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Configure git identity
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Remove dev-only folders and files
+        run: |
+          DEV_PATHS=(
+            "tests/"
+            ".cusas_app/tests/"
+            ".account/tests/"
+            "docs/"
+            ".github/workflows/"   
+            ".data/"
+            ".vscode"
+            "pytest.ini"
+            "conftest.py"
+            "django-errors.log"
+          )
+
+          for path in "${DEV_PATHS[@]}"; do
+            if [ -e "$path" ]; then
+              git rm -rf --cached "$path" 2>/dev/null || true
+              echo "Removed: $path"
+            else
+              echo "Skipped (not found): $path"
+            fi
+          done
+
+      - name: Commit stripped files (if anything changed)
+        run: |
+          if git diff --cached --quiet; then
+            echo "Nothing to strip, skipping commit."
+          else
+            git commit -m "chore(release): strip dev-only folders [skip ci]"
+            git push
+          fi

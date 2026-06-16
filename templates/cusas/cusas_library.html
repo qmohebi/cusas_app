@@ -1,0 +1,55 @@
+{%extends "base.html"%} {% load static %}
+<!-- prettier-ignore -->
+{% block title %}
+Ultrasound Worklist 
+{% endblock%}
+{% block breadcrumb_items %}
+<li class="breadcrumb-item">
+  <a href="{% url 'cusas_app:cusas_home' %}">Worklist & Faults</a>
+</li>
+<li class="breadcrumb-item active" aria-current="page">Library</li>
+{% endblock %}
+<!-- prettier-ignore -->
+{%block nav_elements %} 
+{% include "navbar/partials/_cusas_nav.html" %} 
+{% endblock %}
+<!-- prettier-ignore -->
+{% block subtitle %}Ultrasound Library{% endblock %}
+
+<!-- prettier-ignore -->
+{% block body_class %}
+  class="container mb-5 d-flex flex-column min-vh-100"
+{% endblock %}
+
+{% block content %}
+
+<div class="container mb-3">
+  <div class="d-flex align-items-centre">
+    <div class="w-25 me-2">
+      <label for="user-search" class="form-label visually-hidden"
+        >Search device</label
+      >
+
+      <input
+        id="device-search"
+        type="search"
+        name="query"
+        placeholder="Search by model or location..."
+        class="form-control"
+        hx-get="{% url 'cusas_app:library' %}"
+        hx-trigger="keyup changed delay:400ms"
+        hx-target="#device-table"
+        hx-push-url="true"
+        hx-params="*"
+        autocomplete="off"
+      />
+    </div>
+  </div>
+</div>
+
+<div id="device-table">
+  {% include "cusas/partials/_cusas_device_table.html" %}
+</div>
+<!-- This div contains: the machine's picture, its room, its name and the button export-->
+
+{% endblock %}

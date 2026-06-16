@@ -1,0 +1,73 @@
+name: Sync requirements.txt
+
+on:
+  push:
+    branches:
+      - main
+      - release
+    paths:
+      - "pyproject.toml"
+      - "uv.lock"
+  pull_request:
+    paths:
+      - "pyproject.toml"
+      - "uv.lock"
+
+jobs:
+  sync:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v7
+        with:
+          version: "0.10.4"
+          enable-cache: true
+
+      - name: Update lock (if needed) + export requirements.txt
+        shell: bash
+        run: |
+          set -euo pipefail
+          uv lock
+          uv export --format requirements.txt --no-dev --no-hashes -o requirements.txt
+
+      - name: PR guard (fail if files would change)
+        if: github.event_name == 'pull_request'
+        shell: bash
+        run: |
+          set -euo pipefail
+          if ! git diff --quiet -- requirements.txt uv.lock; then
+            echo "::error::requirements.txt (or uv.lock) is out of date. Run: uv lock && uv export --format requirements.txt -o requirements.txt"
+            git --no-pager diff -- requirements.txt uv.lock
+            exit 1
+          fi
+
+      - name: Commit back to main (if changed)
+        if: github.event_name == 'push'
+        shell: bash
+        run: |
+          set -euo pipefail
+          if git diff --quiet -- requirements.txt uv.lock; then
+            echo "No changes to commit."
+            exit 0
+          fi
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          git add requirements.txt uv.lock
+          git commit -m "chore: sync requirements.txt from uv.lock"
+          git push

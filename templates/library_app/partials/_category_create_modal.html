@@ -1,0 +1,34 @@
+{% load crispy_forms_tags %}
+<div class="modal-header border-0">
+  <h5 class="modal-title" id="newCategoryModal">Add New Category</h5>
+  <button
+    type="button"
+    class="btn-close"
+    data-bs-dismiss="modal"
+    aria-label="Close"
+  ></button>
+</div>
+
+<form
+  hx-post="{% url 'library_app:add_category' %}"
+  enctype="multipart/form-data"
+  hx-target="#newCategoryModalContent"
+  hx-swap="innerHTML"
+  method="post"
+  class="needs-validation"
+  id="newCategory"
+  novalidate
+>
+  <div class="modal-body">
+    {% csrf_token %}
+    <div id="addCategoryFeedback" class="mb-3"></div>
+    {% for field in form %} {{ field|as_crispy_field }} {% endfor %}
+    <div id="addCategoryFlag" data-added="0" hidden></div>
+  </div>
+  <div class="modal-footer border-0">
+    <button type="submit" class="btn btn-primary">Save User</button>
+    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+      Close
+    </button>
+  </div>
+</form>

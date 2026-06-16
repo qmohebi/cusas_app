@@ -1,0 +1,59 @@
+<!-- Out of Hours Modal -->
+<div
+  class="modal fade"
+  id="outOfHoursModal"
+  tabindex="-1"
+  aria-labelledby="outOfHoursModalLabel"
+>
+  <div class="modal-dialog modal-dialog-centered modal-l">
+    <div class="modal-content border-0 shadow-lg">
+      <div class="modal-body text-center py-4">
+        <i class="bx bx-error-circle text-danger" style="font-size: 6rem"></i>
+        <h4 class="mt-2 mb-3">Sorry we are closed now!</h4>
+        <p>
+          We are open: <br /><strong>Monday - Friday </strong><br />
+          <strong>9:00 AM to 5:00 PM</strong>.
+        </p>
+
+        <svg xmlns="http://www.w3.org/2000/svg" class="d-none">
+          <symbol id="info-fill" viewBox="0 0 16 16">
+            <path
+              d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16zm.93-9.412-1 4.705c-.07.34.029.533.304.533.194 0 .487-.07.686-.246l-.088.416c-.287.346-.92.598-1.465.598-.703 0-1.002-.422-.808-1.319l.738-3.468c.064-.293.006-.399-.287-.47l-.451-.081.082-.381 2.29-.287zM8 5.5a1 1 0 1 1 0-2 1 1 0 0 1 0 2z"
+            />
+          </symbol>
+        </svg>
+
+        <div
+          class="alert alert-primary d-flex align-items-center p-3 small"
+          role="alert"
+          style="font-size: 1.2rem; max-width: 600px; margin: 0 auto"
+        >
+          <svg
+            class="bi flex-shrink-0 me-2"
+            width="40"
+            height="40"
+            role="img"
+            aria-label="Info:"
+          >
+            <use xlink:href="#info-fill" />
+          </svg>
+          <div>
+            To request equipment out of hours, please use
+            <a href="http://storefront.cerner.stgeorges.nhs.uk/Citrix/P0442web/"
+              ><strong>Capman</strong></a
+            >
+            on iClip
+          </div>
+        </div>
+        <button
+          type="button"
+          class="btn btn-lg btn-block btn-secondary mt-3 px-4"
+          data-bs-dismiss="modal"
+          id="modalCloseButton"
+        >
+          Close
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

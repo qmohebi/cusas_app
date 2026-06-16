@@ -1,0 +1,169 @@
+{% extends "base.html" %} {% load crispy_forms_tags %}
+<!-- prettier-ignore -->
+{% block breadcrumb_items %}
+<li class="breadcrumb-item">
+  <a href="{% url 'cusas_app:cusas_home' %}">Worklist & Faults</a>
+</li>
+<li class="breadcrumb-item active" aria-current="page">User Management</li>
+{% endblock %}
+
+<!-- prettier-ignore -->
+{%block nav_elements %} 
+{% include "navbar/partials/_cusas_nav.html" %} {% endblock %}
+{% block subtitle %}User Management{% endblock %}
+
+<!-- prettier-ignore -->
+{% block body_class %}
+  class="container mb-5 d-flex flex-column min-vh-100"
+{% endblock %}
+
+{% block content %}
+<div class="container">
+  <div class="d-flex justify-content-between align-items-center mb-2">
+    <div class="w-25 me-2">
+      <label for="user-search" class="form-label visually-hidden">
+        Search users
+      </label>
+      <input
+        id="user-search"
+        type="search"
+        name="query"
+        placeholder="Search by username or location..."
+        class="form-control"
+        hx-get="{% url 'cusas_app:user_management' %}"
+        hx-trigger="keyup changed delay:400ms"
+        hx-target="#profile-table"
+        hx-push-url="true"
+        hx-params="*"
+        autocomplete="off"
+      />
+    </div>
+
+    <div>
+      <button class="btn btn-primary" id="addUser" type="button">
+        Add User
+      </button>
+    </div>
+  </div>
+
+  <div id="profile-table">
+    {% include "cusas/partials/_user_profile_table.html" %}
+  </div>
+</div>
+
+<!-- Add User Modal -->
+<div
+  class="modal fade"
+  id="newUserModal"
+  tabindex="-1"
+  aria-labelledby="newUserModalLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog modal-lg modal-dialog-scrollable">
+    <div class="modal-content">
+      <div class="modal-header border-0">
+        <h5 class="modal-title" id="newUserModalLabel">Add New Profile</h5>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+          aria-label="Close"
+        ></button>
+      </div>
+      <form
+        hx-post="{% url 'cusas_app:add_user' %}"
+        hx-target="#addUserMsg"
+        hx-swap="innerHTML"
+        method="post"
+        class="needs-validation"
+        id="newUser"
+        novalidate
+      >
+        {% csrf_token %}
+        <div class="modal-body">
+          <div id="addUserMsg" class="mb-3"></div>
+          {% for field in form %} {{ field|as_crispy_field }} {% endfor %}
+          <div id="addUserFlag" data-added="0" hidden></div>
+        </div>
+        <div class="modal-footer border-0">
+          <button type="submit" class="btn btn-primary">Save User</button>
+          <button
+            type="button"
+            class="btn btn-secondary"
+            data-bs-dismiss="modal"
+          >
+            Close
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %} {% block scripts %}
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const addUserBtn = document.getElementById("addUser");
+    const addUserModalEl = document.getElementById("newUserModal");
+    const addUserModal = new bootstrap.Modal(addUserModalEl, {
+      backdrop: "static",
+    });
+
+    // Open modal
+    addUserBtn.addEventListener("click", () => addUserModal.show());
+
+    // Select2 styling
+    addUserModalEl.addEventListener("shown.bs.modal", function () {
+      if (window.jQuery && typeof jQuery.fn.select2 === "function") {
+        jQuery(".select2").select2({
+          dropdownParent: jQuery("#newUserModal"),
+          width: "100%",
+          placeholder: "Select one or more locations",
+        });
+      }
+    });
+
+    // Tear down Select2 cleanly and reset the form when modal hides
+    addUserModalEl.addEventListener("hidden.bs.modal", function () {
+      if (window.jQuery && typeof jQuery.fn.select2 === "function") {
+        jQuery("#newUserModal select.select2").select2({
+          theme: "bootstrap-5",
+          dropdownParent: jQuery("#newUserModal"),
+          width: "100%",
+          placeholder: "Select one or more locations",
+          closeOnSelect: false,
+        });
+      }
+      const form = document.getElementById("newUser");
+      if (form) {
+        form.reset();
+
+        form.classList.remove("was-validated");
+      }
+      htmx.ajax("GET", "{% url 'cusas_app:user_management' %}", {
+        target: "#profile-table",
+        swap: "innerHTML",
+      });
+      // clear alert from modal.
+      const messageDiv = document.getElementById("addUserMsg");
+      if (messageDiv) {
+        messageDiv.innerHTML = "";
+      }
+    });
+
+    const form = document.getElementById("newUser");
+    if (form) {
+      form.addEventListener(
+        "submit",
+        function (e) {
+          if (!form.checkValidity()) {
+            e.preventDefault();
+            e.stopPropagation();
+          }
+          form.classList.add("was-validated");
+        },
+        false,
+      );
+    }
+  });
+</script>
+{% endblock %}

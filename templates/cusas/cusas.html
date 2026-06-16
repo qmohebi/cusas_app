@@ -1,0 +1,199 @@
+{%extends "base.html"%}
+<!-- prettier-ignore -->
+{% block title %}
+Ultrasound Worklist 
+{% endblock%}
+{% block breadcrumb %}
+{% endblock %}
+{%block nav_elements %}
+{% include "navbar/partials/_cusas_nav.html" %} {% endblock %}
+<!-- prettier-ignore -->
+{% block subtitle %}Ultrasound QA Management System{% endblock %}
+
+<!-- prettier-ignore -->
+{% block body_class %}
+  class="container mb-5 d-flex flex-column min-vh-100"
+{% endblock %}
+
+{% block content %}
+
+<div class="tables-container">
+  <!-- Worklist table -->
+  <div class="">
+    <h3 class="text-center">Worklist</h3>
+
+    <table class="table cusas-table cusas-table-hover">
+      <thead>
+        <tr>
+          <th>Equipment No</th>
+          <th>Location</th>
+          <th>Room</th>
+          <th>Ultrasound Scanner</th>
+          <th>Due Date</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for machine in machines %}
+        <tr
+          class="clickable-row"
+          data-href="{% url 'cusas_app:qa' machine.asset_number %}"
+        >
+        <td>{{ machine.asset_number }}</td>
+          <td>{{ machine.location.location_name }}</td>
+          <td>{{ machine.machine_room }}</td>
+          <td>{{ machine.model }}</td>
+          <!-- Different color, it depends on the date -->
+          <td
+            class="{% if today >= machine.next_qa_date %}text-danger{% elif machine.next_qa_date > today and two_days >= machine.next_qa_date %}text-warning{% elif machine.next_qa_date is None %}text-danger{% else %}text-success{% endif %}"
+          >
+            {{ machine.next_qa_date }}
+          </td>
+        </tr>
+        {% empty %}
+        <tr>
+          <td colspan="4" style="text-align: center">No machine found</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  <!-- Outstanding faults table -->
+  <div class="">
+    <h3 class="text-center">Outstanding Faults</h3>
+    <table class="table mb-0 align-middle cusas-table">
+      <thead>
+        <tr>
+          <th>Job No</th>
+          <th>Room</th>
+          <th>Fault</th>
+          <th>Device</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for fault in faults %}
+
+        <tr>
+          <td>
+            {# job number #} {% if fault.equip_job_no %}
+            <a
+              href="#"
+              class="modal-link"
+              data-bs-toggle="modal"
+              data-bs-target="#faultModal"
+              data-job="{{ fault.equip_job_no }}"
+              data-status="{{ fault.jobstatus_shortname }}"
+              data-work="{{ fault.workdone }}"
+              data-creationdate="{{ fault.creationdate|date:'d-m-Y' |default:'-' }}"
+              data-fault = "{{ fault.reportedfault }}"
+            >
+              {{ fault.equip_job_no }}
+            </a>
+            {% else %} - {% endif %}
+          </td>
+
+          {# Probe / Machine type #}
+          <td>
+            {# room location #}
+            <!-- prettier-ignore -->
+            {% if fault.machine.room_location %} 
+              {{ fault.machine.room_location }} 
+            {% elif fault.probe.machine.room_location %} 
+              {{ fault.probe.machine.room_location }} 
+            {% else %} 
+              -
+            {% endif %}
+          </td>
+
+          {# Room – taken from machine or probe #} {# Fault description #}
+          <td>{{ fault.reportedfault|default:"-" }}</td>
+          <td>
+            <!-- prettier-ignore -->
+            {# device list either ultrasound or probe #}
+            {% if fault.machine_id %} 
+              Ultrasound Machine
+            {% elif fault.probe_id %} 
+              Probe
+            {% else %} 
+              - 
+            {% endif %}
+          </td>
+          <!-- prettier-ignore -->
+          {# Job number #} {# Progress / status – mapped from equip_job_status#}
+          <td>{{ fault.jobstatus_shortname }}</td>
+        </tr>
+        {% empty %}
+        <tr>
+          <td colspan="5" style="text-align: center">No faults found</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <div
+    class="modal fade"
+    id="faultModal"
+    tabindex="-1"
+    aria-labelledby="faultModalLabel"
+    aria-hidden="true"
+  >
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content border-0 shadow-lg">
+        <div class="modal-header">
+          <h5 class="modal-title" id="faultModalLabel">Details for Job: <span id="modal-job"></span></h5>
+          <button
+            type="button"
+            class="btn-close"
+            data-bs-dismiss="modal"
+            aria-label="Close"
+          ></button>
+        </div>
+        <div class="modal-body text-start">
+          <p>Creation Date: <span id="modal-creation-date"></span></p>
+          <p>Status: <span id="modal-status"></span></p>
+          <p><strong>Fault:</strong><br><span id="modal-fault"></span></p>
+          <p><strong>Work Done</strong>:<br><span id="modal-work-done"></span></p>
+        </div>
+        <div class="modal-footer">
+          <button
+            type="button"
+            class="btn btn-secondary"
+            data-bs-dismiss="modal"
+          >
+            Close
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Use to click on worklist's lines
+  document.querySelectorAll(".clickable-row").forEach((row) => {
+    row.addEventListener("click", () => {
+      window.location.href = row.dataset.href;
+    });
+  });
+
+  // Use the modal
+  const faultModal = document.getElementById("faultModal");
+
+  faultModal.addEventListener("show.bs.modal", function (event) {
+    const trigger = event.relatedTarget;
+    if (!trigger) return;
+
+    document.getElementById("modal-job").textContent =
+      trigger.dataset.job || "";
+    document.getElementById("modal-status").textContent =
+      trigger.dataset.status || "";
+    document.getElementById("modal-creation-date").textContent =
+      trigger.dataset.creationdate || "";
+    document.getElementById("modal-fault").textContent =
+      trigger.dataset.fault || "";
+    document.getElementById("modal-work-done").textContent =
+      trigger.dataset.work || "";
+  });
+</script>
+{% endblock %}
