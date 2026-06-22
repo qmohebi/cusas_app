@@ -316,11 +316,6 @@ EMAIL_HOST = env.str("SMTP")
 EMAIL_PORT = env.int("SMTP_PORT")
 # Project constants
 
-# Customer ID determines what locations are showing on the app
-# this ensure users at SGH or ESTH see related locations
-CUSTOMER_ID = env.str("EQUIP_SITE_ID")
-
-
 CELERY_BROKER_URL = "redis://127.0.0.1:6379/0"
 CELERY_RESULT_BACKEND = "redis://127.0.0.1:6379"
 
