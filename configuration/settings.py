@@ -16,12 +16,10 @@ env.read_env(BASE_DIR / ".env")
 
 
 def env_bool(name: str, default: bool = False) -> bool:
-    return str(os.getenv(name, "1" if default else "0")).strip().lower() in (
-        "1",
-        "true",
-        "yes",
-        "on",
-    )
+    value = os.getenv(name)
+    if value is None:
+        return default
+    return value.strip().lower() in ("1", "true", "yes", "on")
 
 
 def is_installed(module_name: str) -> bool:
@@ -61,7 +59,6 @@ INSTALLED_APPS = [
     # project apps
     "accounts",
     "mpce_services",
-    "library_app",
     "cusas_app.apps.CusasAppConfig",
     # third-party
     "crispy_forms",
@@ -134,18 +131,14 @@ REMOTE_USER_PROTECTED_PATHS = [
 
 DATABASES: dict = {
     "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
+        "ENGINE": "django.db.backends.postgresql",
+        "NAME": PG_DB_NAME,
+        "USER": PG_USERNAME,
+        "PASSWORD": PG_PASSOWRD,
+        "HOST": PG_DB_HOST,
+        "PORT": PG_PORT,
+        "OPTIONS": {"sslmode": "disable"},
     },
-    #     "default": {
-    #         "ENGINE": "django.db.backends.postgresql",
-    #         "NAME": PG_DB_NAME,
-    #         "USER": PG_USERNAME,
-    #         "PASSWORD": PG_PASSOWRD,
-    #         "HOST": PG_DB_HOST,
-    #         "PORT": PG_PORT,
-    #         "OPTIONS": {"sslmode": "disable"},
-    #     },
 }
 
 
@@ -322,14 +315,16 @@ CELERY_RESULT_BACKEND = "redis://127.0.0.1:6379"
 
 # for production settings
 if not DEBUG:
-    SECURE_SSL_REDIRECT = env.bool("SECURE_SSL_REDIRECT", default=False)
+    SECURE_SSL_REDIRECT = env_bool("SECURE_SSL_REDIRECT", default=False)
 
-    SESSION_COOKIE_SECURE = env.bool("SESSION_COOKIE_SECURE", default=False)
-    CSRF_COOKIE_SECURE = env.bool("CSRF_COOKIE_SECURE", default=False)
+    SESSION_COOKIE_SECURE = env_bool("SESSION_COOKIE_SECURE", default=False)
+    CSRF_COOKIE_SECURE = env_bool("CSRF_COOKIE_SECURE", default=False)
 
     SECURE_HSTS_SECONDS = env.int("SECURE_HSTS_SECONDS", default=0)
-    SECURE_HSTS_INCLUDE_SUBDOMAINS = False
-    SECURE_HSTS_PRELOAD = False
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = env_bool(
+        "SECURE_HSTS_INCLUDE_SUBDOMAINS", default=False
+    )
+    SECURE_HSTS_PRELOAD = env_bool("SECURE_HSTS_PRELOAD", default=False)
 
     SESSION_COOKIE_AGE = 15 * 60
     SESSION_SAVE_EVERY_REQUEST = True
